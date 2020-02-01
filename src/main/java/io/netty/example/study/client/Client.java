@@ -5,6 +5,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioChannelOption;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.example.study.client.codec.OrderFrameDecoder;
 import io.netty.example.study.client.codec.OrderFrameEncoder;
@@ -24,6 +25,8 @@ public class Client {
 
         Bootstrap bootstrap = new Bootstrap();
         bootstrap.channel(NioSocketChannel.class);
+//        修改客户端连接服务端时间为10秒,默认30秒
+        bootstrap.option(NioChannelOption.CONNECT_TIMEOUT_MILLIS, 10 * 1000);
         bootstrap.group(new NioEventLoopGroup());
 
         bootstrap.handler(new ChannelInitializer<NioSocketChannel>() {
