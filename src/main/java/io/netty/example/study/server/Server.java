@@ -40,12 +40,12 @@ public class Server {
             @Override
             protected void initChannel(NioSocketChannel channel) throws Exception {
                 ChannelPipeline pipeline = channel.pipeline();
-                pipeline.addLast(new OrderFrameDecoder());
-                pipeline.addLast(new OrderFrameEncoder());
-                pipeline.addLast(new OrderProtocolEncoder());
-                pipeline.addLast(new OrderProtocolDecoder());
-                pipeline.addLast(new LoggingHandler(LogLevel.INFO));
-                pipeline.addLast(new OrderServerProcessHandler());
+                pipeline.addLast("frameDecoder", new OrderFrameDecoder());
+                pipeline.addLast("orderFrameEncoder", new OrderFrameEncoder());
+                pipeline.addLast("orderProtocolEncoder", new OrderProtocolEncoder());
+                pipeline.addLast("orderProtocolDecoder", new OrderProtocolDecoder());
+                pipeline.addLast("loggingHandler", new LoggingHandler(LogLevel.INFO));
+                pipeline.addLast("orderServerProcessHandler", new OrderServerProcessHandler());
             }
         });
 
