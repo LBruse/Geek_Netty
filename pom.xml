@@ -41,5 +41,16 @@
             <artifactId>guava</artifactId>
             <version>19.0</version>
         </dependency>
+        <!-- metrics -->
+        <dependency>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-core</artifactId>
+            <version>4.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-jmx</artifactId>
+            <version>4.1.1</version>
+        </dependency>
     </dependencies>
 </project>

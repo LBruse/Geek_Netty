@@ -12,6 +12,7 @@ import io.netty.example.study.server.codec.OrderFrameDecoder;
 import io.netty.example.study.server.codec.OrderFrameEncoder;
 import io.netty.example.study.server.codec.OrderProtocolDecoder;
 import io.netty.example.study.server.codec.OrderProtocolEncoder;
+import io.netty.example.study.server.codec.handler.MetricHandler;
 import io.netty.example.study.server.codec.handler.OrderServerProcessHandler;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
@@ -36,6 +37,8 @@ public class Server {
 //        设置TCP连接等待数量
         serverBootstrap.option(NioChannelOption.SO_BACKLOG, 1024);
 
+        MetricHandler metricHandler = new MetricHandler();
+
         serverBootstrap.childHandler(new ChannelInitializer<NioSocketChannel>() {
             @Override
             protected void initChannel(NioSocketChannel channel) throws Exception {
@@ -44,6 +47,7 @@ public class Server {
                 pipeline.addLast("orderFrameEncoder", new OrderFrameEncoder());
                 pipeline.addLast("orderProtocolEncoder", new OrderProtocolEncoder());
                 pipeline.addLast("orderProtocolDecoder", new OrderProtocolDecoder());
+                pipeline.addLast("metricHandler", metricHandler);
                 pipeline.addLast("loggingHandler", new LoggingHandler(LogLevel.INFO));
                 pipeline.addLast("orderServerProcessHandler", new OrderServerProcessHandler());
             }
