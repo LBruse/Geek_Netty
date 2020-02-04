@@ -14,9 +14,9 @@ import io.netty.example.study.server.codec.OrderProtocolDecoder;
 import io.netty.example.study.server.codec.OrderProtocolEncoder;
 import io.netty.example.study.server.codec.handler.MetricHandler;
 import io.netty.example.study.server.codec.handler.OrderServerProcessHandler;
-import io.netty.handler.flush.FlushConsolidationHandler;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import io.netty.handler.traffic.GlobalTrafficShapingHandler;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import io.netty.util.concurrent.UnorderedThreadPoolEventExecutor;
 
@@ -44,10 +44,16 @@ public class Server {
         UnorderedThreadPoolEventExecutor business = new UnorderedThreadPoolEventExecutor(10,
                 new DefaultThreadFactory("business"));
 
+//        GlobalTrafficShapingHandler tsHandler = new GlobalTrafficShapingHandler(new NioEventLoopGroup(),
+//                100 * 1024 * 1024, 100 * 1024 * 1024);
+
         serverBootstrap.childHandler(new ChannelInitializer<NioSocketChannel>() {
             @Override
             protected void initChannel(NioSocketChannel channel) throws Exception {
                 ChannelPipeline pipeline = channel.pipeline();
+//                添加流量整形Handler
+//                pipeline.addLast("TSHandler", tsHandler);
+
                 pipeline.addLast("frameDecoder", new OrderFrameDecoder());
                 pipeline.addLast("orderFrameEncoder", new OrderFrameEncoder());
                 pipeline.addLast("orderProtocolEncoder", new OrderProtocolEncoder());
@@ -55,6 +61,7 @@ public class Server {
                 pipeline.addLast("metricHandler", metricHandler);
                 pipeline.addLast("loggingHandler", new LoggingHandler(LogLevel.INFO));
 
+//                添加增强写Handler
 //                pipeline.addLast("flushEnhance", new FlushConsolidationHandler(5,
 //                        true));
 
