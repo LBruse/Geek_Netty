@@ -47,7 +47,10 @@ public class Client {
 //        发送请求
         RequestMessage requestMessage = new RequestMessage(IdUtil.nextId(),
                 new OrderOperation(1001, "土豆"));
-        channelFuture.channel().writeAndFlush(requestMessage);
+
+        for (int i = 0; i < 20; i++) {
+            channelFuture.channel().writeAndFlush(requestMessage);
+        }
 
         channelFuture.channel().closeFuture().get();
 

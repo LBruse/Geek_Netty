@@ -17,6 +17,7 @@ import io.netty.example.study.server.codec.handler.OrderServerProcessHandler;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.util.concurrent.DefaultThreadFactory;
+import io.netty.util.concurrent.UnorderedThreadPoolEventExecutor;
 
 import java.util.concurrent.ExecutionException;
 
@@ -39,6 +40,9 @@ public class Server {
 
         MetricHandler metricHandler = new MetricHandler();
 
+        UnorderedThreadPoolEventExecutor business = new UnorderedThreadPoolEventExecutor(10,
+                new DefaultThreadFactory("business"));
+
         serverBootstrap.childHandler(new ChannelInitializer<NioSocketChannel>() {
             @Override
             protected void initChannel(NioSocketChannel channel) throws Exception {
@@ -49,7 +53,9 @@ public class Server {
                 pipeline.addLast("orderProtocolDecoder", new OrderProtocolDecoder());
                 pipeline.addLast("metricHandler", metricHandler);
                 pipeline.addLast("loggingHandler", new LoggingHandler(LogLevel.INFO));
-                pipeline.addLast("orderServerProcessHandler", new OrderServerProcessHandler());
+
+                pipeline.addLast(business,
+                        "orderServerProcessHandler", new OrderServerProcessHandler());
             }
         });
 
