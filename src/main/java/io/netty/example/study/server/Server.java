@@ -14,6 +14,7 @@ import io.netty.example.study.server.codec.OrderProtocolDecoder;
 import io.netty.example.study.server.codec.OrderProtocolEncoder;
 import io.netty.example.study.server.codec.handler.MetricHandler;
 import io.netty.example.study.server.codec.handler.OrderServerProcessHandler;
+import io.netty.example.study.server.codec.handler.ServerIdleCheckHandler;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.traffic.GlobalTrafficShapingHandler;
@@ -51,8 +52,10 @@ public class Server {
             @Override
             protected void initChannel(NioSocketChannel channel) throws Exception {
                 ChannelPipeline pipeline = channel.pipeline();
+//                pipeline.addLast("loggingHandler debug",new LoggingHandler(LogLevel.DEBUG));
 //                添加流量整形Handler
 //                pipeline.addLast("TSHandler", tsHandler);
+                pipeline.addLast("idleCheck", new ServerIdleCheckHandler());
 
                 pipeline.addLast("frameDecoder", new OrderFrameDecoder());
                 pipeline.addLast("orderFrameEncoder", new OrderFrameEncoder());
