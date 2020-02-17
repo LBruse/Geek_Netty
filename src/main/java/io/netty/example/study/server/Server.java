@@ -15,6 +15,9 @@ import io.netty.example.study.server.codec.OrderProtocolEncoder;
 import io.netty.example.study.server.codec.handler.MetricHandler;
 import io.netty.example.study.server.codec.handler.OrderServerProcessHandler;
 import io.netty.example.study.server.codec.handler.ServerIdleCheckHandler;
+import io.netty.handler.ipfilter.IpFilterRuleType;
+import io.netty.handler.ipfilter.IpSubnetFilterRule;
+import io.netty.handler.ipfilter.RuleBasedIpFilter;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.traffic.GlobalTrafficShapingHandler;
@@ -48,11 +51,28 @@ public class Server {
 //        GlobalTrafficShapingHandler tsHandler = new GlobalTrafficShapingHandler(new NioEventLoopGroup(),
 //                100 * 1024 * 1024, 100 * 1024 * 1024);
 
+
+//        禁止本机客户端连接[黑名单]
+        IpSubnetFilterRule ipSubnetFilterRule = new IpSubnetFilterRule(
+                "127.0.0.1", 8, IpFilterRuleType.REJECT
+        );
+
+//        禁止127.0xxx的IP连接[黑名单,但是127.0.0.1可以通过]
+//        IpSubnetFilterRule ipSubnetFilterRule = new IpSubnetFilterRule(
+//                "127.0.0.1", 16, IpFilterRuleType.REJECT
+//        );
+
+        RuleBasedIpFilter ruleBasedIpFilter = new RuleBasedIpFilter(ipSubnetFilterRule);
+
         serverBootstrap.childHandler(new ChannelInitializer<NioSocketChannel>() {
             @Override
             protected void initChannel(NioSocketChannel channel) throws Exception {
                 ChannelPipeline pipeline = channel.pipeline();
 //                pipeline.addLast("loggingHandler debug",new LoggingHandler(LogLevel.DEBUG));
+
+//                黑名单设置
+                pipeline.addLast("ipFilter", ruleBasedIpFilter);
+
 //                添加流量整形Handler
 //                pipeline.addLast("TSHandler", tsHandler);
                 pipeline.addLast("idleCheck", new ServerIdleCheckHandler());
